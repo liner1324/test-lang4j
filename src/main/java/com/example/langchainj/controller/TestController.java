@@ -22,22 +22,5 @@ public class TestController {
                 .modelName("gpt-4o-mini")
                 .build();
         String userMessage = "Tell me a joke";
-        model.generate(userMessage, new StreamingResponseHandler<AiMessage>() {
-
-            @Override
-            public void onNext(String token) {
-                System.out.println("onNext: " + token);
-            }
-
-            @Override
-            public void onComplete(Response<AiMessage> response) {
-                System.out.println("onComplete: " + response);
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                error.printStackTrace();
-            }
-        });
     }
 }
