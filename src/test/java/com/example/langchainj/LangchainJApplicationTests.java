@@ -4,9 +4,11 @@ import com.example.langchainj.entity.Person;
 import com.example.langchainj.entity.State;
 import com.example.langchainj.service.Assistant;
 import com.example.langchainj.service.PersonExtractor;
+import com.example.langchainj.service.Translator;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.bsc.langgraph4j.CompiledGraph;
 import org.bsc.langgraph4j.GraphStateException;
@@ -18,6 +20,7 @@ import org.bsc.langgraph4j.state.AppenderChannel;
 import org.bsc.langgraph4j.state.Channel;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,19 +44,21 @@ class LangchainJApplicationTests {
                 .apiKey(apiKey)
                 .modelName("gpt-4o-mini")
                 .build();
-        AiServices.builder(Assistant.class)
+        Translator translator = AiServices.builder(Translator.class)
                 .chatLanguageModel(model)
-                .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10));
-        StateGraph<MessagesState> stateGraph = new StateGraph<>(MessagesState.SCHEMA, MessagesState::new);
-
-        AsyncEdgeAction<MessagesState> edgeAction = edge_async(state -> "first");
-        stateGraph.addConditionalEdges("nodeA", edgeAction, mapOf( "first","nodeB","second","nodeC"));
-        CompiledGraph<MessagesState> compiledGraph = stateGraph.compile();
-
-        AsyncNodeAction<State> myNode = node_async(state -> {
-            System.out.println( "In myNode: " );
-            return state.data();
-        });
+                .build();
+        String translate = translator.translate("hello");
+        log.info(translate);
+//        StateGraph<MessagesState> stateGraph = new StateGraph<>(MessagesState.SCHEMA, MessagesState::new);
+//
+//        AsyncEdgeAction<MessagesState> edgeAction = edge_async(state -> "first");
+//        stateGraph.addConditionalEdges("nodeA", edgeAction, mapOf( "first","nodeB","second","nodeC"));
+//        CompiledGraph<MessagesState> compiledGraph = stateGraph.compile();
+//
+//        AsyncNodeAction<State> myNode = node_async(state -> {
+//            System.out.println( "In myNode: " );
+//            return state.data();
+//        });
 //        StateGraph<MyState> graph = new StateGraph<>(MessagesState.SCHEMA, MyState::new);
 //
 //        AsyncNodeAction<State> myNode = node_async(state -> {
